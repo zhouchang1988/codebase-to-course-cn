@@ -1,0 +1,65 @@
+name: Publish Skill to ClawHub
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install ClawHub CLI
+        run: npm install -g clawhub
+
+      - name: Extract metadata
+        id: meta
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "slug=$REPO_NAME" >> "$GITHUB_OUTPUT"
+          echo "name=$REPO_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Validate required files
+        shell: bash
+        run: |
+          test -f SKILL.md || (echo "SKILL.md not found" && exit 1)
+
+      - name: Login to ClawHub
+        run: clawhub login --token "$CLAWHUB_TOKEN"
+
+      - name: Publish to ClawHub
+        shell: bash
+        run: |
+          clawhub publish . \
+            --slug "${{ steps.meta.outputs.slug }}" \
+            --name "${{ steps.meta.outputs.name }}" \
+            --version "${{ steps.meta.outputs.version }}" \
+            --tags "latest" \
+            --changelog "Release ${{ steps.meta.outputs.tag }} from GitHub"
+
+      - name: Success summary
+        run: |
+          echo "Published slug: ${{ steps.meta.outputs.slug }}"
+          echo "Published version: ${{ steps.meta.outputs.version }}"
+          echo "Source tag: ${{ steps.meta.outputs.tag }}"

@@ -233,6 +233,10 @@ course-name/
 
 **步骤 2：定制 `_base.html`** — 替换标题、强调色、导航点
 
+**GitHub 仓库链接处理：**
+- 如果课程来源于 GitHub 仓库（用户提供了 GitHub URL），保留 `_base.html` 中的 `.nav-repo-link` 元素，将 `REPO_URL` 替换为实际的 GitHub 仓库地址
+- 如果课程来源于本地目录或当前项目（非 GitHub），**删除整个 `.nav-repo-link` 元素**
+
 **步骤 3：编写模块** — 根据版本选择参考文件
 
 选择对应的 content-philosophy 文件：

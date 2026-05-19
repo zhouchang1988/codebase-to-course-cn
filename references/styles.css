@@ -205,6 +205,18 @@ pre::-webkit-scrollbar { display: none; }
   max-width: 300px;
 }
 
+.nav-repo-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast);
+  margin-left: var(--space-2);
+  flex-shrink: 0;
+}
+.nav-repo-link:hover {
+  color: var(--color-accent);
+}
+
 .nav-dots {
   display: flex;
   align-items: center;
